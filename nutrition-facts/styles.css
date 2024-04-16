@@ -1,0 +1,128 @@
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: sans-serif;
+}
+
+.label {
+  border: 2px solid black;
+  max-width: 280px;
+  height: auto;
+  margin: 20px auto;
+  padding: 0 5px;
+}
+
+header h1 {
+  text-align: center;
+  font-weight: 800;
+  margin: -8px 0 -5px 0;
+}
+
+.divider {
+  border-bottom: 1px solid gray;
+  position: relative;
+}
+
+.nutrients div {
+  margin: 0 5px;
+}
+
+p {
+  display: flex;
+  margin: 0 5px;
+  justify-content: space-between;
+}
+
+.bold {
+  font-weight: 800;
+}
+
+main div:not(.divider) {
+  margin: 0 -5px;
+  line-height: 20px;
+  padding-bottom: 5px;
+}
+
+.serving-information {
+  background-color: #d9f0fc;
+}
+
+.calories {
+  background-color: #f7c1d8;
+}
+
+.nutrients {
+  background-color: #ffe5b8;
+  font-size: 0.8rem;
+  padding-bottom: 0 !important;
+}
+
+.large {
+  height: 10px;
+  border: 0;
+  background-color: black;
+}
+
+.medium {
+  height: 5px;
+  border: 0;
+  background-color: black;
+}
+
+.small-text {
+  font-size: 0.6rem;
+}
+
+.huge-text {
+  font-size: 1.6rem;
+}
+
+.daily-value {
+  padding: 0 !important;
+  text-align: right;
+  font-size: 0.8rem;
+}
+
+.daily-value p {
+  margin: 0;
+  padding: 0 5px 2px;
+  display: inline-block;
+}
+
+.purple-bg {
+  background-color: #e4d5e8;
+  margin-bottom: -1px !important;
+  margin-right: -5px;
+  padding: 0 5px;
+  position: relative;
+  min-width: 41px;
+  text-align: right;
+}
+
+.float {
+  margin-bottom: -10px !important;
+}
+
+.indent {
+  margin-left: 20px;
+}
+
+div .double-indent {
+  margin-left: 40px !important;
+}
+
+p .double-indent {
+  margin-left: 35px !important;
+}
+
+footer {
+  font-size: 0.6rem;
+  padding: 2px 0 2px 5px;
+  text-indent: -1em;
+}
