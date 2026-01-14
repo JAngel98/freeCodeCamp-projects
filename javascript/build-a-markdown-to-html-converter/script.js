@@ -24,14 +24,13 @@ function convertMarkdown() {
     // Convert links [text](url) into HTML links
     const links = images.replace(/\[(.*?)\]\((.*?)\)/gim, '<a href="$2">$1</a>');
 
-    // Convert line breaks into <br> tags
-    const lineBreaks = links.replace(/\n/gim, '<br>');
-
     // Convert quotes > into blockquotes
-    const blockquotes = lineBreaks.replace(/&gt; (.*$)/gim, '<blockquote>$1</blockquote>');
+    const blockquotes = links.replace(/^> (.*$)/gim, '<blockquote>$1</blockquote>');
 
     document.getElementById("preview").innerHTML = blockquotes;
     document.getElementById("html-output").textContent = blockquotes;
+
+    return blockquotes;
 }
 
 markdownInput.addEventListener("input", convertMarkdown);
