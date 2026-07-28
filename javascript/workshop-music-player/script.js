@@ -4,7 +4,10 @@ const pauseButton = document.getElementById('pause');
 const nextButton = document.getElementById('next');
 const previousButton = document.getElementById('previous');
 
-const songs = document.querySelectorAll('.playlist-song > button');
+const songs = document.querySelectorAll('.playlist-song');
+
+const playingSong = document.getElementById('player-song-title');
+const songArtist = document.getElementById('player-song-artist');
 
 const allSongs = [
     {
@@ -87,15 +90,15 @@ const userData = {
     songCurrentTime: 0
 };
 
-function playSong(songId) {
+function playSong(songId, start = true) {
     const song = userData.songs.find(song => song.id === songId);
-    
+
     if (song) {
         audio.src = song.src;
         audio.title = song.title;
     }
 
-    if (!userData.currentSong) {
+    if (!userData.currentSong || start) {
         audio.currentTime = 0;
     } else {
         audio.currentTime = userData.songCurrentTime;
@@ -104,6 +107,13 @@ function playSong(songId) {
     playButton.classList.add('playing');
     userData.currentSong = song;
     audio.play();
+
+    setPlayerDisplay();
+    highlightCurrentSong();
+    setPlayButtonAccessibleText();
+
+    console.log(song.title);
+
 };
 
 function pauseSong() {
@@ -116,23 +126,108 @@ function getCurrentSongIndex() {
     if (!userData.currentSong) {
         return -1;
     }
-    
+
     return userData.songs.findIndex(song => song.id === userData.currentSong.id);
 }
 
+function getNextSong() {
+    const lastSongIndex = userData.songs.length - 1;
+
+    if (userData.currentSong && userData.currentSong.id === lastSongIndex) {
+        return undefined;
+    }
+
+    return userData.songs[getCurrentSongIndex() + 1];
+}
+
+function getPreviousSong() {
+    const firstSongIndex = userData.songs[0];
+
+    if (userData.currentSong && userData.currentSong.id === firstSongIndex) {
+        return undefined;
+    }
+
+    return userData.songs[getCurrentSongIndex() - 1];
+}
+
+
+function playNextSong() {
+    if (userData.currentSong === null) {
+        playSong(userData.songs[0].id);
+        return;
+    }
+
+    const nextSong = getNextSong();
+
+    if (!nextSong) {
+        userData.currentSong = null;
+        userData.songCurrentTime = 0;
+        setPlayerDisplay();
+        highlightCurrentSong();
+        setPlayButtonAccessibleText();
+        pauseSong();
+        return;
+    }
+
+    playSong(nextSong.id);
+}
+
+function playPreviousSong() {
+    if (userData.currentSong === null) {
+        return;
+    }
+
+    const prevSong = getPreviousSong();
+
+    if (!prevSong) {
+        playSong(userData.songs[0].id);
+        return;
+    }
+
+    playSong(prevSong.id);
+}
+
+function highlightCurrentSong() {
+    const previousCurrentSong = document.querySelector('.playlist-song[aria-current="true"]');
+    previousCurrentSong?.removeAttribute("aria-current");
+
+    const songToHighlight = document.getElementById(`song-${userData.currentSong?.id}`);
+
+    if (songToHighlight) {
+        songToHighlight.setAttribute("aria-current", "true");
+    } 
+}
+
+function setPlayerDisplay() {
+    playingSong.textContent = userData.currentSong?.title || "";
+    songArtist.textContent = userData.currentSong?.artist || "";
+}
+
+function setPlayButtonAccessibleText() {
+    const accessibleText = userData.currentSong ? `Play ${userData.currentSong.title}` : "Play";
+    playButton.setAttribute("aria-label", accessibleText);
+}
+
 songs.forEach(song => {
-    song.addEventListener('click', () => {
-        const songId = Number(song.parentNode.id.slice(5));
-        playSong(songId);
-    })  
+    const id = song.getAttribute("id").slice(5);
+    const songBtn = song.querySelector("button");
+    songBtn.addEventListener("click", () => {
+        playSong(Number(id));
+    })
 });
 
 playButton.addEventListener('click', () => {
     if (!userData.currentSong) {
-        playSong(userData.songs[1].id);
+        playSong(userData.songs[0].id);
     } else {
-        playSong(userData.currentSong.id);
+        playSong(userData.currentSong.id, false);
     }
 });
 
 pauseButton.addEventListener('click', pauseSong);
+
+nextButton.addEventListener('click', playNextSong);
+
+previousButton.addEventListener('click', playPreviousSong);
+
+audio.addEventListener('ended', playNextSong);
