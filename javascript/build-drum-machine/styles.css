@@ -18,6 +18,20 @@ body {
     font-weight: bold;
 }
 
+#drum-machine {
+    display: flex;
+    flex-direction: column;
+}
+
+#display {
+    width: 100%;
+    padding: 20px;
+    margin-top: 10px;
+    border-radius: 10px;
+    text-align: center;
+    background-color: #405060;
+}
+
 #pad-bank {
     display: flex;
     width: 340px;
@@ -42,4 +56,8 @@ body {
 
 .drum-pad p {
     color: white;
+}
+
+.playing {
+    background-color: orange;
 }
