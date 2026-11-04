@@ -1,13 +1,32 @@
 const mainSection = document.getElementById('main-section');
 const formSection = document.getElementById('form-section');
+const bookmarkListSection = document.getElementById('bookmark-list-section');
 const addBookmarkBtn = document.getElementById('add-bookmark-button');
 const categoryNameForm = document.querySelectorAll('.category-name');
 const categoryOption = document.getElementById('category-dropdown');
 const closeFormBtn = document.getElementById('close-form-button');
 const addBookmarkBtnForm = document.getElementById('add-bookmark-button-form');
+const viewCategoryBtn = document.getElementById('view-category-button');
+const categoryList = document.getElementById('category-list');
+const closeListBtn = document.getElementById('close-list-button');
+const delBookmarkBtn = document.getElementById('delete-bookmark-button');
+const bookmarkName = document.getElementById("name");
+const bookmarkURL = document.getElementById("url");
 
 const getBookmarks = () => {
-    return localStorage.getItem('bookmarks') ? JSON.parse(localStorage.getItem('bookmarks')) : [];
+    try {
+        const parsedBookmarks = JSON.parse(localStorage.getItem('bookmarks'));
+
+        if (Array.isArray(parsedBookmarks) && parsedBookmarks.every(item =>
+            item.hasOwnProperty('name') &&
+            item.hasOwnProperty('category') &&
+            item.hasOwnProperty('url')
+        )) return parsedBookmarks;
+
+        return [];
+    } catch {
+        return [];
+    }
 }
 
 const setBookmarks = (array) => {
@@ -22,7 +41,12 @@ const displayOrCloseForm = () => {
     formSection.classList.toggle('hidden');
 }
 
-const getSelectedCategory = () => {
+const displayOrHideCategory = () => {
+    mainSection.classList.toggle('hidden');
+    bookmarkListSection.classList.toggle('hidden');
+}
+
+const getSelectedCategoryName = () => {
     return categoryOption.selectedOptions[0].innerText;
 }
 
@@ -37,7 +61,7 @@ const validateEmptyInputs = (formId) => {
         };
     };
 
-    return { isEmpty, nodeList };
+    return isEmpty, nodeList;
 }
 
 const cleanFormInputs = (formId) => {
@@ -48,9 +72,38 @@ const cleanFormInputs = (formId) => {
     };
 }
 
+const fillBookmarkList = () => {
+    categoryList.innerHTML = "";
+    const selectedCategory = getSelectedCategoryName();
+
+    categoryNameForm.forEach(node => {
+        node.innerText = selectedCategory;
+    });
+
+    const filteredBookmark = getBookmarks().filter(bm => bm.category === categoryOption.value);
+
+    if (filteredBookmark.length === 0) {
+        categoryList.innerHTML =
+            '<p>No Bookmarks Found</p>';
+    }
+
+    filteredBookmark.forEach(({ name, category, url }) => {
+        categoryList.innerHTML +=
+            `<div>
+            <input type="radio" name="bookmarks" id="${name}" value="${name}">
+            <label for="${name}"><a href="${url}">${name}</a></label>
+        </div>`;
+    })
+}
+
+viewCategoryBtn.addEventListener('click', () => {
+    displayOrHideCategory();
+    fillBookmarkList();
+});
+
 addBookmarkBtn.addEventListener('click', () => {
     categoryNameForm.forEach(node => {
-        node.innerText = getSelectedCategory();
+        node.innerText = getSelectedCategoryName();
     });
 
     displayOrCloseForm();
@@ -61,16 +114,16 @@ closeFormBtn.addEventListener('click', () => {
 });
 
 addBookmarkBtnForm.addEventListener('click', () => {
-    const { isEmpty, nodeList } = validateEmptyInputs('form-section');
+    const isEmpty = validateEmptyInputs('form-section');    
 
     if (isEmpty) {
         alert('Revise los campos vacíos.');
         return;
     };
 
-    currentBookmarks.name = nodeList[0].value;
-    currentBookmarks.category = getSelectedCategory();
-    currentBookmarks.url = nodeList[1].value;
+    currentBookmarks.name = bookmarkName.value;
+    currentBookmarks.category = categoryOption.value;
+    currentBookmarks.url = bookmarkURL.value;
 
     bookmarks.push(currentBookmarks);
 
@@ -79,14 +132,23 @@ addBookmarkBtnForm.addEventListener('click', () => {
     cleanFormInputs('form-section');
 
     displayOrCloseForm();
-
-    // console.log(bookmarks);
-
-
 });
 
+closeListBtn.addEventListener('click', () => {
+    displayOrHideCategory();
+});
 
+delBookmarkBtn.addEventListener('click', () => {
+    const radioInputs = document.querySelectorAll('input[type="radio"]');
 
-// document.getElementById('test').addEventListener('click', () => {
-//     displayOrCloseForm();
-// });
+    for (const radio of radioInputs) {
+        if (radio.checked) {
+            const index = bookmarks.findIndex(bm => bm.name === radio.value && bm.category === categoryOption.value);
+            bookmarks.splice(index, 1);
+            setBookmarks(bookmarks);
+            fillBookmarkList();
+
+            break;
+        }
+    }
+});
